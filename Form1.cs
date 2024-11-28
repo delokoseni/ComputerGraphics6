@@ -1,3 +1,5 @@
+using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace ComputerGraphics6
@@ -6,16 +8,21 @@ namespace ComputerGraphics6
     {
         private Bitmap originalImage; // Оригинальное изображение
         private Bitmap currentImage;  // Текущее изображение
+
         public Form1()
         {
             InitializeComponent();
         }
+
         private void buttonReset_Click(object sender, EventArgs e)
         {
             if (originalImage != null)
             {
                 currentImage = new Bitmap(originalImage);
                 pictureBox.Image = currentImage;
+                textBoxAddNoisePoints.Text = "";
+                textBoxAddNoiseLines.Text = "";
+                textBoxAddNoiseCircles.Text = "";
             }
         }
 
@@ -27,7 +34,7 @@ namespace ComputerGraphics6
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     originalImage = new Bitmap(openFileDialog.FileName);
-                    currentImage = new Bitmap(originalImage);
+                    currentImage = new Bitmap(originalImage); // Устанавливаем текущее изображение равным оригиналу
                     pictureBox.Image = currentImage;
                 }
             }
@@ -37,7 +44,7 @@ namespace ComputerGraphics6
         {
             if (originalImage != null && ValidateInput(textBoxAddNoisePoints, out int pointCount))
             {
-                currentImage = AddPointNoise(new Bitmap(originalImage), pointCount);
+                currentImage = AddPointNoise(currentImage, pointCount);
                 pictureBox.Image = currentImage;
             }
         }
@@ -46,7 +53,7 @@ namespace ComputerGraphics6
         {
             if (originalImage != null && ValidateInput(textBoxAddNoiseLines, out int lineCount))
             {
-                currentImage = AddLineNoise(new Bitmap(originalImage), lineCount);
+                currentImage = AddLineNoise(currentImage, lineCount);
                 pictureBox.Image = currentImage;
             }
         }
@@ -55,7 +62,7 @@ namespace ComputerGraphics6
         {
             if (originalImage != null && ValidateInput(textBoxAddNoiseCircles, out int circleCount))
             {
-                currentImage = AddCircleNoise(new Bitmap(originalImage), circleCount);
+                currentImage = AddCircleNoise(currentImage, circleCount);
                 pictureBox.Image = currentImage;
             }
         }
