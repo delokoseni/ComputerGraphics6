@@ -76,6 +76,15 @@ namespace ComputerGraphics6
             }
         }
 
+        private void buttonMedianFilter_Click(object sender, EventArgs e)
+        {
+            if (currentImage != null)
+            {
+                currentImage = ApplyMedianFilter(currentImage, 1); // Например, радиус 1
+                pictureBox.Image = currentImage;
+            }
+        }
+
         private bool ValidateInput(TextBox textBox, out int noiseCount)
         {
             noiseCount = 0;
@@ -190,6 +199,72 @@ namespace ComputerGraphics6
             }
 
             return Color.FromArgb(r / count, g / count, b / count);
+        }
+
+        private Bitmap ApplyMedianFilter(Bitmap bitmap, int radius)
+        {
+            Bitmap result = new Bitmap(bitmap.Width, bitmap.Height);
+            int size = radius * 2 + 1;
+
+            for (int x = 0; x < bitmap.Width; x++)
+            {
+                for (int y = 0; y < bitmap.Height; y++)
+                {
+                    Color newColor = GetMedianColor(bitmap, x, y, radius);
+                    result.SetPixel(x, y, newColor);
+                }
+            }
+            return result;
+        }
+
+        private Color GetMedianColor(Bitmap bitmap, int centerX, int centerY, int radius)
+        {
+            var colors = new System.Collections.Generic.List<Color>();
+
+            for (int x = -radius; x <= radius; x++)
+            {
+                for (int y = -radius; y <= radius; y++)
+                {
+                    int newX = centerX + x;
+                    int newY = centerY + y;
+
+                    if (newX >= 0 && newY >= 0 && newX < bitmap.Width && newY < bitmap.Height)
+                    {
+                        colors.Add(bitmap.GetPixel(newX, newY));
+                    }
+                }
+            }
+
+            // Достаем медианное значение (цвет)
+            return GetMedian(colors);
+        }
+
+        private Color GetMedian(System.Collections.Generic.List<Color> colors)
+        {
+            if (colors.Count == 0) return Color.Black;
+
+            // Сортируем цвета по яркости
+            var sortedColors = colors.OrderBy(c => c.ToArgb()).ToList();
+            int middleIndex = sortedColors.Count / 2;
+
+            // Если количество цветовых значений нечётное, вернуть средний элемент.
+            if (sortedColors.Count % 2 == 1)
+                return sortedColors[middleIndex];
+            else
+            {
+                // В случае чётного количества цветов, вернуть средний между двумя центральными.
+                Color avgColor = AverageColor(sortedColors[middleIndex - 1], sortedColors[middleIndex]);
+                return avgColor;
+            }
+        }
+
+
+        private Color AverageColor(Color c1, Color c2)
+        {
+            return Color.FromArgb(
+                (c1.R + c2.R) / 2,
+                (c1.G + c2.G) / 2,
+                (c1.B + c2.B) / 2);
         }
     }
 }

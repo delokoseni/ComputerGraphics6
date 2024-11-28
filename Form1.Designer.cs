@@ -101,6 +101,7 @@
             buttonMedianFilter.TabIndex = 5;
             buttonMedianFilter.Text = "Медианный фильтр";
             buttonMedianFilter.UseVisualStyleBackColor = true;
+            buttonMedianFilter.Click += buttonMedianFilter_Click;
             // 
             // buttonEmbossing
             // 
