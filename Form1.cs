@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Windows.Forms;
 
 namespace ComputerGraphics6
@@ -23,6 +24,8 @@ namespace ComputerGraphics6
                 textBoxAddNoisePoints.Text = "";
                 textBoxAddNoiseLines.Text = "";
                 textBoxAddNoiseCircles.Text = "";
+                textBoxMedianFilterRadius.Text = "";
+                textBoxUniformFilterRadius.Text = "";
             }
         }
 
@@ -42,7 +45,7 @@ namespace ComputerGraphics6
 
         private void buttonAddNoisePoints_Click(object sender, EventArgs e)
         {
-            if (originalImage != null && ValidateInput(textBoxAddNoisePoints, out int pointCount))
+            if (originalImage != null && ValidateNoiseInput(textBoxAddNoisePoints, out int pointCount))
             {
                 currentImage = AddPointNoise(currentImage, pointCount);
                 pictureBox.Image = currentImage;
@@ -51,7 +54,7 @@ namespace ComputerGraphics6
 
         private void buttonAddNoiseLines_Click(object sender, EventArgs e)
         {
-            if (originalImage != null && ValidateInput(textBoxAddNoiseLines, out int lineCount))
+            if (originalImage != null && ValidateNoiseInput(textBoxAddNoiseLines, out int lineCount))
             {
                 currentImage = AddLineNoise(currentImage, lineCount);
                 pictureBox.Image = currentImage;
@@ -60,7 +63,7 @@ namespace ComputerGraphics6
 
         private void buttonAddNoiseCircles_Click(object sender, EventArgs e)
         {
-            if (originalImage != null && ValidateInput(textBoxAddNoiseCircles, out int circleCount))
+            if (originalImage != null && ValidateNoiseInput(textBoxAddNoiseCircles, out int circleCount))
             {
                 currentImage = AddCircleNoise(currentImage, circleCount);
                 pictureBox.Image = currentImage;
@@ -71,7 +74,7 @@ namespace ComputerGraphics6
         {
             if (currentImage != null && ValidateRadiusInput(textBoxUniformFilterRadius, out int radius))
             {
-                currentImage = ApplyUniformBlur(currentImage, radius);
+                currentImage = ApplyUniformFilter(currentImage, radius);
                 pictureBox.Image = currentImage;
             }
         }
@@ -85,6 +88,7 @@ namespace ComputerGraphics6
             }
         }
 
+        // Метод обрабатывающий нажатие на кнопку "Тиснение"
         private void buttonEmbossing_Click(object sender, EventArgs e)
         {
             if (currentImage != null)
@@ -94,7 +98,7 @@ namespace ComputerGraphics6
             }
         }
 
-        private bool ValidateInput(TextBox textBox, out int noiseCount)
+        private bool ValidateNoiseInput(TextBox textBox, out int noiseCount)
         {
             noiseCount = 0;
             if (int.TryParse(textBox.Text, out int count) && count > 0)
@@ -152,6 +156,7 @@ namespace ComputerGraphics6
             return false;
         }
 
+        // Метод добавляющий точечные шумы на изображение
         private Bitmap AddPointNoise(Bitmap bitmap, int pointCount)
         {
             Random rand = new Random();
@@ -165,6 +170,7 @@ namespace ComputerGraphics6
             return bitmap;
         }
 
+        // Метод добавляющий шумы в виде линий на изображение
         private Bitmap AddLineNoise(Bitmap bitmap, int lineCount)
         {
             Random rand = new Random();
@@ -182,6 +188,7 @@ namespace ComputerGraphics6
             return bitmap;
         }
 
+        // Метод добавляющий шумы в виде окружностей на изображение
         private Bitmap AddCircleNoise(Bitmap bitmap, int circleCount)
         {
             Random rand = new Random();
@@ -199,86 +206,109 @@ namespace ComputerGraphics6
             return bitmap;
         }
 
-        private Bitmap ApplyUniformBlur(Bitmap bitmap, int radius)
+        // Метод применяющий равномерный фильтр
+        private Bitmap ApplyUniformFilter(Bitmap bitmap, int radius)
         {
             Bitmap result = new Bitmap(bitmap.Width, bitmap.Height);
             int size = radius * 2 + 1;
+            int[,] kernel = new int[size, size];
 
-            for (int x = 0; x < bitmap.Width; x++)
+            // Предварительное создание ядра
+            for (int x = 0; x < size; x++)
             {
-                for (int y = 0; y < bitmap.Height; y++)
+                for (int y = 0; y < size; y++)
+                {
+                    kernel[x, y] = 1; // Все значения равны 1 для равномерного размытия
+                }
+            }
+
+            // Применение размытия
+            for (int x = radius; x < bitmap.Width - radius; x++)
+            {
+                for (int y = radius; y < bitmap.Height - radius; y++)
                 {
                     Color newColor = GetAverageColor(bitmap, x, y, radius);
                     result.SetPixel(x, y, newColor);
                 }
             }
+
             return result;
         }
 
+        // Метод для получения среднего значения цвета в указанном радиусе
         private Color GetAverageColor(Bitmap bitmap, int centerX, int centerY, int radius)
         {
-            int r = 0, g = 0, b = 0;
+            long r = 0, g = 0, b = 0;
             int count = 0;
 
-            for (int x = -radius; x <= radius; x++)
-            {
-                for (int y = -radius; y <= radius; y++)
-                {
-                    int newX = centerX + x;
-                    int newY = centerY + y;
+            Rectangle rect = new Rectangle(centerX - radius, centerY - radius, radius * 2 + 1, radius * 2 + 1);
+            BitmapData data = bitmap.LockBits(rect, ImageLockMode.ReadOnly, bitmap.PixelFormat);
 
-                    if (newX >= 0 && newY >= 0 && newX < bitmap.Width && newY < bitmap.Height)
+            unsafe
+            {
+                byte* ptr = (byte*)data.Scan0;
+                for (int x = 0; x < data.Width; x++)
+                {
+                    for (int y = 0; y < data.Height; y++)
                     {
-                        Color pixelColor = bitmap.GetPixel(newX, newY);
-                        r += pixelColor.R;
-                        g += pixelColor.G;
-                        b += pixelColor.B;
+                        int pixelIndex = (y * data.Stride) + (x * 4); 
+                        b += ptr[pixelIndex];
+                        g += ptr[pixelIndex + 1];
+                        r += ptr[pixelIndex + 2];
                         count++;
                     }
                 }
             }
 
-            return Color.FromArgb(r / count, g / count, b / count);
+            bitmap.UnlockBits(data);
+
+            return Color.FromArgb((int)(r / count), (int)(g / count), (int)(b / count));
         }
 
+        // Метод применяющий медианный фильтр
         private Bitmap ApplyMedianFilter(Bitmap bitmap, int radius)
         {
             Bitmap result = new Bitmap(bitmap.Width, bitmap.Height);
-            int size = radius * 2 + 1;
 
-            for (int x = 0; x < bitmap.Width; x++)
+            for (int x = radius; x < bitmap.Width - radius; x++)
             {
-                for (int y = 0; y < bitmap.Height; y++)
+                for (int y = radius; y < bitmap.Height - radius; y++)
                 {
                     Color newColor = GetMedianColor(bitmap, x, y, radius);
                     result.SetPixel(x, y, newColor);
                 }
             }
+
             return result;
         }
 
+        // Метод для получения медианного значения цвета в указанном радиусе
         private Color GetMedianColor(Bitmap bitmap, int centerX, int centerY, int radius)
         {
-            var colors = new System.Collections.Generic.List<Color>();
+            var colors = new List<Color>();
 
-            for (int x = -radius; x <= radius; x++)
+            Rectangle rect = new Rectangle(centerX - radius, centerY - radius, radius * 2 + 1, radius * 2 + 1);
+            BitmapData data = bitmap.LockBits(rect, ImageLockMode.ReadOnly, bitmap.PixelFormat);
+
+            unsafe
             {
-                for (int y = -radius; y <= radius; y++)
+                byte* ptr = (byte*)data.Scan0;
+                for (int x = 0; x < data.Width; x++)
                 {
-                    int newX = centerX + x;
-                    int newY = centerY + y;
-
-                    if (newX >= 0 && newY >= 0 && newX < bitmap.Width && newY < bitmap.Height)
+                    for (int y = 0; y < data.Height; y++)
                     {
-                        colors.Add(bitmap.GetPixel(newX, newY));
+                        int pixelIndex = (y * data.Stride) + (x * 4); // Предполагаем формат BGRA
+                        colors.Add(Color.FromArgb(ptr[pixelIndex + 2], ptr[pixelIndex + 1], ptr[pixelIndex])); // BGRA в ARGB
                     }
                 }
             }
 
-            // Достаем медианное значение (цвет)
+            bitmap.UnlockBits(data);
+
             return GetMedian(colors);
         }
 
+        // Метод для получения медианного цвета в указанном радиусе
         private Color GetMedian(System.Collections.Generic.List<Color> colors)
         {
             if (colors.Count == 0) return Color.Black;
@@ -298,6 +328,7 @@ namespace ComputerGraphics6
             }
         }
 
+        // Метод для подсчета среднего цвета
         private Color AverageColor(Color c1, Color c2)
         {
             return Color.FromArgb(
@@ -306,6 +337,7 @@ namespace ComputerGraphics6
                 (c1.B + c2.B) / 2);
         }
 
+        // Метод для применения тиснения к изображению
         private Bitmap ApplyEmbossing(Bitmap bitmap)
         {
             Bitmap result = new Bitmap(bitmap.Width, bitmap.Height);
