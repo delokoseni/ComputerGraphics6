@@ -32,7 +32,7 @@
             buttonAddNoisePoints = new Button();
             buttonAddNoiseLines = new Button();
             buttonAddNoiseCircles = new Button();
-            buttonIniformFilter = new Button();
+            buttonUniformFilter = new Button();
             buttonMedianFilter = new Button();
             buttonEmbossing = new Button();
             buttonReset = new Button();
@@ -83,14 +83,15 @@
             buttonAddNoiseCircles.UseVisualStyleBackColor = true;
             buttonAddNoiseCircles.Click += buttonAddNoiseCircles_Click;
             // 
-            // buttonIniformFilter
+            // buttonUniformFilter
             // 
-            buttonIniformFilter.Location = new Point(12, 151);
-            buttonIniformFilter.Name = "buttonIniformFilter";
-            buttonIniformFilter.Size = new Size(217, 29);
-            buttonIniformFilter.TabIndex = 4;
-            buttonIniformFilter.Text = "Равномерный фильтр";
-            buttonIniformFilter.UseVisualStyleBackColor = true;
+            buttonUniformFilter.Location = new Point(12, 151);
+            buttonUniformFilter.Name = "buttonUniformFilter";
+            buttonUniformFilter.Size = new Size(217, 29);
+            buttonUniformFilter.TabIndex = 4;
+            buttonUniformFilter.Text = "Равномерный фильтр";
+            buttonUniformFilter.UseVisualStyleBackColor = true;
+            buttonUniformFilter.Click += buttonUniformFilter_Click;
             // 
             // buttonMedianFilter
             // 
@@ -162,7 +163,7 @@
             Controls.Add(buttonReset);
             Controls.Add(buttonEmbossing);
             Controls.Add(buttonMedianFilter);
-            Controls.Add(buttonIniformFilter);
+            Controls.Add(buttonUniformFilter);
             Controls.Add(buttonAddNoiseCircles);
             Controls.Add(buttonAddNoiseLines);
             Controls.Add(buttonAddNoisePoints);
@@ -180,7 +181,7 @@
         private Button buttonAddNoisePoints;
         private Button buttonAddNoiseLines;
         private Button buttonAddNoiseCircles;
-        private Button buttonIniformFilter;
+        private Button buttonUniformFilter;
         private Button buttonMedianFilter;
         private Button buttonEmbossing;
         private Button buttonReset;

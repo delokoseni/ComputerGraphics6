@@ -67,6 +67,15 @@ namespace ComputerGraphics6
             }
         }
 
+        private void buttonUniformFilter_Click(object sender, EventArgs e)
+        {
+            if (currentImage != null)
+            {
+                currentImage = ApplyUniformBlur(currentImage, 5); // Например, радиус 5
+                pictureBox.Image = currentImage;
+            }
+        }
+
         private bool ValidateInput(TextBox textBox, out int noiseCount)
         {
             noiseCount = 0;
@@ -139,6 +148,48 @@ namespace ComputerGraphics6
                 }
             }
             return bitmap;
+        }
+
+        private Bitmap ApplyUniformBlur(Bitmap bitmap, int radius)
+        {
+            Bitmap result = new Bitmap(bitmap.Width, bitmap.Height);
+            int size = radius * 2 + 1;
+
+            for (int x = 0; x < bitmap.Width; x++)
+            {
+                for (int y = 0; y < bitmap.Height; y++)
+                {
+                    Color newColor = GetAverageColor(bitmap, x, y, radius);
+                    result.SetPixel(x, y, newColor);
+                }
+            }
+            return result;
+        }
+
+        private Color GetAverageColor(Bitmap bitmap, int centerX, int centerY, int radius)
+        {
+            int r = 0, g = 0, b = 0;
+            int count = 0;
+
+            for (int x = -radius; x <= radius; x++)
+            {
+                for (int y = -radius; y <= radius; y++)
+                {
+                    int newX = centerX + x;
+                    int newY = centerY + y;
+
+                    if (newX >= 0 && newY >= 0 && newX < bitmap.Width && newY < bitmap.Height)
+                    {
+                        Color pixelColor = bitmap.GetPixel(newX, newY);
+                        r += pixelColor.R;
+                        g += pixelColor.G;
+                        b += pixelColor.B;
+                        count++;
+                    }
+                }
+            }
+
+            return Color.FromArgb(r / count, g / count, b / count);
         }
     }
 }
