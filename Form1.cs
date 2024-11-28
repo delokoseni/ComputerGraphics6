@@ -124,16 +124,32 @@ namespace ComputerGraphics6
         private bool ValidateRadiusInput(TextBox textBox, out int radius)
         {
             radius = 0;
+
+            if (originalImage == null)
+            {
+                MessageBox.Show("Сначала загрузите изображение.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
             if (int.TryParse(textBox.Text, out int parsedRadius) && parsedRadius > 0)
             {
-                radius = parsedRadius;
-                return true;
+                int maxRadius = Math.Min(originalImage.Width, originalImage.Height) / 2; 
+                if (parsedRadius <= maxRadius)
+                {
+                    radius = parsedRadius;
+                    return true;
+                }
+                else
+                {
+                    MessageBox.Show($"Введите радиус меньше или равный {maxRadius}.", "Ошибка ввода", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
             else
             {
                 MessageBox.Show("Введите корректное значение радиуса больше 0.", "Ошибка ввода", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
             }
+
+            return false;
         }
 
         private Bitmap AddPointNoise(Bitmap bitmap, int pointCount)
