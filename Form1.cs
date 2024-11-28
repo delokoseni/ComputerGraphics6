@@ -85,6 +85,15 @@ namespace ComputerGraphics6
             }
         }
 
+        private void buttonEmbossing_Click(object sender, EventArgs e)
+        {
+            if (currentImage != null)
+            {
+                currentImage = ApplyEmbossing(currentImage);
+                pictureBox.Image = currentImage;
+            }
+        }
+
         private bool ValidateInput(TextBox textBox, out int noiseCount)
         {
             noiseCount = 0;
@@ -258,13 +267,43 @@ namespace ComputerGraphics6
             }
         }
 
-
         private Color AverageColor(Color c1, Color c2)
         {
             return Color.FromArgb(
                 (c1.R + c2.R) / 2,
                 (c1.G + c2.G) / 2,
                 (c1.B + c2.B) / 2);
+        }
+
+        private Bitmap ApplyEmbossing(Bitmap bitmap)
+        {
+            Bitmap result = new Bitmap(bitmap.Width, bitmap.Height);
+
+            // Проходим по каждому пикселю, кроме краев
+            for (int x = 1; x < bitmap.Width - 1; x++)
+            {
+                for (int y = 1; y < bitmap.Height - 1; y++)
+                {
+                    // Получаем цвета соседних пикселей
+                    Color current = bitmap.GetPixel(x, y);
+                    Color right = bitmap.GetPixel(x + 1, y);
+                    Color bottom = bitmap.GetPixel(x, y + 1);
+
+                    // Вычисляем разности для создания эффекта тиснения
+                    int r = Clamp(current.R - right.R + 128);
+                    int g = Clamp(current.G - right.G + 128);
+                    int b = Clamp(current.B - bottom.B + 128);
+
+                    result.SetPixel(x, y, Color.FromArgb(r, g, b));
+                }
+            }
+
+            return result;
+        }
+
+        private int Clamp(int value)
+        {
+            return Math.Max(0, Math.Min(255, value));
         }
     }
 }

@@ -49,7 +49,7 @@
             buttonDownload.Name = "buttonDownload";
             buttonDownload.Size = new Size(217, 29);
             buttonDownload.TabIndex = 0;
-            buttonDownload.Text = "Загрузит изображение";
+            buttonDownload.Text = "Загрузить изображение";
             buttonDownload.UseVisualStyleBackColor = true;
             buttonDownload.Click += buttonDownload_Click;
             // 
@@ -111,6 +111,7 @@
             buttonEmbossing.TabIndex = 6;
             buttonEmbossing.Text = "Тиснение";
             buttonEmbossing.UseVisualStyleBackColor = true;
+            buttonEmbossing.Click += buttonEmbossing_Click;
             // 
             // buttonReset
             // 
