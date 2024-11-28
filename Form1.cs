@@ -69,18 +69,18 @@ namespace ComputerGraphics6
 
         private void buttonUniformFilter_Click(object sender, EventArgs e)
         {
-            if (currentImage != null)
+            if (currentImage != null && ValidateRadiusInput(textBoxUniformFilterRadius, out int radius))
             {
-                currentImage = ApplyUniformBlur(currentImage, 5); // Например, радиус 5
+                currentImage = ApplyUniformBlur(currentImage, radius);
                 pictureBox.Image = currentImage;
             }
         }
 
         private void buttonMedianFilter_Click(object sender, EventArgs e)
         {
-            if (currentImage != null)
+            if (currentImage != null && ValidateRadiusInput(textBoxMedianFilterRadius, out int radius))
             {
-                currentImage = ApplyMedianFilter(currentImage, 1); // Например, радиус 1
+                currentImage = ApplyMedianFilter(currentImage, radius);
                 pictureBox.Image = currentImage;
             }
         }
@@ -119,6 +119,21 @@ namespace ComputerGraphics6
                 MessageBox.Show("Введите корректное число больше 0.", "Ошибка ввода", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             return false;
+        }
+
+        private bool ValidateRadiusInput(TextBox textBox, out int radius)
+        {
+            radius = 0;
+            if (int.TryParse(textBox.Text, out int parsedRadius) && parsedRadius > 0)
+            {
+                radius = parsedRadius;
+                return true;
+            }
+            else
+            {
+                MessageBox.Show("Введите корректное значение радиуса больше 0.", "Ошибка ввода", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
         }
 
         private Bitmap AddPointNoise(Bitmap bitmap, int pointCount)

@@ -40,6 +40,8 @@
             textBoxAddNoisePoints = new TextBox();
             textBoxAddNoiseLines = new TextBox();
             textBoxAddNoiseCircles = new TextBox();
+            textBoxUniformFilterRadius = new TextBox();
+            textBoxMedianFilterRadius = new TextBox();
             ((System.ComponentModel.ISupportInitialize)pictureBox).BeginInit();
             SuspendLayout();
             // 
@@ -85,7 +87,7 @@
             // 
             // buttonUniformFilter
             // 
-            buttonUniformFilter.Location = new Point(12, 151);
+            buttonUniformFilter.Location = new Point(147, 154);
             buttonUniformFilter.Name = "buttonUniformFilter";
             buttonUniformFilter.Size = new Size(217, 29);
             buttonUniformFilter.TabIndex = 4;
@@ -95,7 +97,7 @@
             // 
             // buttonMedianFilter
             // 
-            buttonMedianFilter.Location = new Point(12, 186);
+            buttonMedianFilter.Location = new Point(147, 189);
             buttonMedianFilter.Name = "buttonMedianFilter";
             buttonMedianFilter.Size = new Size(217, 29);
             buttonMedianFilter.TabIndex = 5;
@@ -153,11 +155,27 @@
             textBoxAddNoiseCircles.Size = new Size(125, 27);
             textBoxAddNoiseCircles.TabIndex = 11;
             // 
+            // textBoxUniformFilterRadius
+            // 
+            textBoxUniformFilterRadius.Location = new Point(16, 156);
+            textBoxUniformFilterRadius.Name = "textBoxUniformFilterRadius";
+            textBoxUniformFilterRadius.Size = new Size(125, 27);
+            textBoxUniformFilterRadius.TabIndex = 12;
+            // 
+            // textBoxMedianFilterRadius
+            // 
+            textBoxMedianFilterRadius.Location = new Point(16, 191);
+            textBoxMedianFilterRadius.Name = "textBoxMedianFilterRadius";
+            textBoxMedianFilterRadius.Size = new Size(125, 27);
+            textBoxMedianFilterRadius.TabIndex = 13;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(882, 553);
+            Controls.Add(textBoxMedianFilterRadius);
+            Controls.Add(textBoxUniformFilterRadius);
             Controls.Add(textBoxAddNoiseCircles);
             Controls.Add(textBoxAddNoiseLines);
             Controls.Add(textBoxAddNoisePoints);
@@ -191,5 +209,7 @@
         private TextBox textBoxAddNoisePoints;
         private TextBox textBoxAddNoiseLines;
         private TextBox textBoxAddNoiseCircles;
+        private TextBox textBoxUniformFilterRadius;
+        private TextBox textBoxMedianFilterRadius;
     }
 }
